@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jackle</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #121213;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 10px 0;
+            border-bottom: 1px solid #3a3a3c;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            letter-spacing: 2px;
+            text-align: center;
+            margin-bottom: 5px;
+            color: #6aaa64;
+        }
+        
+        .game-info {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .game-mode-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .mode-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            background-color: #3a3a3c;
+            color: white;
+        }
+        
+        .mode-btn.active {
+            background-color: #6aaa64;
+        }
+        
+        .mode-btn:hover:not(.active) {
+            background-color: #565658;
+        }
+        
+        #game-board-container {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            margin: 20px 0;
+        }
+        
+        #game-board {
+            display: grid;
+            grid-template-rows: repeat(6, 1fr);
+            gap: 5px;
+        }
+        
+        .row {
+            display: grid;
+            gap: 5px;
+            justify-content: center;
+        }
+        
+        .tile {
+            width: 60px;
+            height: 60px;
+            border: 2px solid #3a3a3c;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            user-select: none;
+        }
+        
+        .tile.filled {
+            border-color: #565758;
+            animation: pop 0.1s;
+        }
+        
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .keyboard {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 20px;
+            width: 500px;
+            max-width: 95vw;
+        }
+        
+        .keyboard-row {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+        }
+        
+        .key {
+            height: 58px;
+            min-width: 43px;
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #818384;
+            color: white;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            user-select: none;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+        
+        .key.wide {
+            flex: 1.5;
+            font-size: 0.8rem;
+        }
+        
+        .key:hover {
+            background-color: #5a5a5c;
+        }
+        
+        .key.correct {
+            background-color: #6aaa64;
+        }
+        
+        .key.present {
+            background-color: #c9b458;
+        }
+        
+        .key.absent {
+            background-color: #3a3a3c;
+        }
+        
+        .tile.correct {
+            background-color: #6aaa64;
+            border-color: #6aaa64;
+        }
+        
+        .tile.present {
+            background-color: #c9b458;
+            border-color: #c9b458;
+        }
+        
+        .tile.absent {
+            background-color: #3a3a3c;
+            border-color: #3a3a3c;
+        }
+        
+        .message {
+            height: 30px;
+            margin: 10px 0;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .message.error {
+            color: #ff6b6b;
+        }
+        
+        .message.success {
+            color: #6aaa64;
+        }
+        
+        .country-hint {
+            background-color: #1a1a1b;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 0.95rem;
+            text-align: center;
+            max-width: 500px;
+            display: none;
+            line-height: 1.5;
+        }
+        
+        .country-hint.show {
+            display: block;
+        }
+        
+        .stats {
+            display: flex;
+            gap: 25px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .stat-box {
+            background-color: #1a1a1b;
+            padding: 15px;
+            border-radius: 5px;
+            min-width: 100px;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #6aaa64;
+        }
+        
+        .instructions {
+            max-width: 600px;
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #1a1a1b;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        .instructions h3 {
+            color: #6aaa64;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .instructions ul {
+            padding-left: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .instructions li {
+            margin-bottom: 5px;
+        }
+        
+        .game-mode-description {
+            font-style: italic;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #3a3a3c;
+            text-align: center;
+        }
+        
+        .word-length-indicator {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #a0a0a0;
+        }
+        
+        /* POPUP STYLES */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .popup-overlay.show {
+            display: flex;
+        }
+        
+        .popup {
+            background-color: #1a1a1b;
+            border-radius: 10px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            border: 2px solid #3a3a3c;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+        
+        .popup h2 {
+            color: #ff6b6b;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+        }
+        
+        .popup p {
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            line-height: 1.5;
+        }
+        
+        .popup-word {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #6aaa64;
+            margin: 20px 0;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+        
+        .popup-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .popup-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .popup-btn-new {
+            background-color: #6aaa64;
+            color: white;
+        }
+        
+        .popup-btn-close {
+            background-color: #3a3a3c;
+            color: white;
+        }
+        
+        .popup-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .keyboard {
+                width: 95vw;
+            }
+            
+            .key {
+                min-width: 30px;
+                height: 50px;
+                font-size: 0.8rem;
+            }
+            
+            .stats {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .tile {
+                width: 50px;
+                height: 50px;
+                font-size: 1.5rem;
+            }
+            
+            .popup {
+                padding: 20px;
+            }
+            
+            .popup-word {
+                font-size: 2rem;
+            }
+            
+            .popup-buttons {
+                flex-direction: column;
+            }
+        }
+        
+        @media (max-width: 400px) {
+            .tile {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="game-info">
+                <div class="mode-info">
+                    Mode: <span id="mode-name">Normal</span>
+                </div>
+            </div>
+        </header>
+        
+        <h1>Jackle <img src="https://yt3.googleusercontent.com/bu29B2Crvfklt8nXuKZe6ekhRZvgCn2orZltPE2Z2sAvoqNsIJ21Ggjedl9oOqWzmx88X-pMaQ=s160-c-k-c0x00ffffff-no-rj" height=50 width=50></h1>
+        
+        <div class="game-mode-selector">
+            <button class="mode-btn active" data-mode="normal">Normal</button>
+            <button class="mode-btn" data-mode="hardcore">Hardcore</button>
+            <button class="mode-btn" data-mode="countrylle">Countrylle</button>
+        </div>
+        
+        <div class="game-mode-description" id="mode-description">
+            Guess the word in 6 tries. After each guess, the color of the tiles will change to show how close your guess was to the word.
+        </div>
+        
+        <div class="word-length-indicator" id="word-length-indicator">
+            Word length: <span id="current-word-length">5</span> letters
+        </div>
+        
+        <div id="game-board-container">
+            <div id="game-board"></div>
+        </div>
+        
+        <div class="message" id="message"></div>
+        
+        <div class="country-hint" id="country-hint">
+            <!-- Country hints will appear here in Countrylle mode -->
+        </div>
+        
+        <div class="keyboard">
+            <div class="keyboard-row">
+                <div class="key" data-key="Q">Q</div>
+                <div class="key" data-key="W">W</div>
+                <div class="key" data-key="E">E</div>
+                <div class="key" data-key="R">R</div>
+                <div class="key" data-key="T">T</div>
+                <div class="key" data-key="Y">Y</div>
+                <div class="key" data-key="U">U</div>
+                <div class="key" data-key="I">I</div>
+                <div class="key" data-key="O">O</div>
+                <div class="key" data-key="P">P</div>
+            </div>
+            <div class="keyboard-row">
+                <div class="key" data-key="A">A</div>
+                <div class="key" data-key="S">S</div>
+                <div class="key" data-key="D">D</div>
+                <div class="key" data-key="F">F</div>
+                <div class="key" data-key="G">G</div>
+                <div class="key" data-key="H">H</div>
+                <div class="key" data-key="J">J</div>
+                <div class="key" data-key="K">K</div>
+                <div class="key" data-key="L">L</div>
+            </div>
+            <div class="keyboard-row">
+                <div class="key wide" data-key="Enter">Enter</div>
+                <div class="key" data-key="Z">Z</div>
+                <div class="key" data-key="X">X</div>
+                <div class="key" data-key="C">C</div>
+                <div class="key" data-key="V">V</div>
+                <div class="key" data-key="B">B</div>
+                <div class="key" data-key="N">N</div>
+                <div class="key" data-key="M">M</div>
+                <div class="key wide" data-key="Backspace">
+                    <i class="fas fa-backspace"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-box">
+                <div class="stat-value" id="games-played">0</div>
+                <div>Games</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="win-streak">0</div>
+                <div>Streak</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="win-percentage">0%</div>
+                <div>Win %</div>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3>How to Play</h3>
+            <ul>
+                <li><strong>Normal Mode:</strong> Guess the word of the day (any length).</li>
+                <li><strong>Hardcore Mode:</strong> More challenging words that are less common.</li>
+                <li><strong>Countrylle Mode:</strong> Guess a country name. After each guess, you'll get a hint about the relationship between your guess and the target country.</li>
+                <li>Green tiles indicate correct letters in the correct position.</li>
+                <li>Yellow tiles indicate correct letters in the wrong position.</li>
+                <li>Gray tiles indicate letters not in the word.</li>
+                <li>You have 6 attempts to guess the word.</li>
+                <li>Each day has a new word. After 110 days, the cycle repeats.</li>
+                <li>Your progress is automatically saved.</li>
+            </ul>
+            <p>Click on the keyboard or use your physical keyboard to play.</p>
+        </div>
+    </div>
+    
+    <!-- FAILURE POPUP -->
+    <div class="popup-overlay" id="failure-popup">
+        <div class="popup">
+            <h2>Game Over!</h2>
+            <p>You ran out of attempts. The word was:</p>
+            <div class="popup-word" id="popup-word">WORD</div>
+            <p>Better luck next time!</p>
+            <div class="popup-buttons">
+                <button class="popup-btn popup-btn-new" id="popup-new-game">New Game</button>
+                <button class="popup-btn popup-btn-close" id="popup-close">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game configuration
+        const CONFIG = {
+            maxAttempts: 6,
+            totalDays: 110,
+            startDate: "2024-01-01" // Fixed start date for consistency
+        };
+        
+        // 110 days of words for Normal mode (organized in order)
+        const NORMAL_WORDS = [
+            // Days 1-30
+            "JACK", "SUCKS", "PLAYBUTTON", "LIFE", "JSAL", "STUFF", "GEOGRAPHY", "GUESSING", "UNITEDKINGDOM", "HACKER",
+            "TROLLING", "SKYCADE", "WILBUR", "JESUS", "SUBSCRIBE", "DUCK", "FIVERR", "SEX", "BLOOD", "OSCAR",
+            "FITNESS", "RICK", "NARCISSIST", "WRISTS", "DRWHO", "XLIFE", "BECKY", "FLOSSY", "KONG", "JMW",
+            
+            // Days 31-60
+            "DREAM", "TRADINGCARDS", "MINECRAFT", "VEGETARIAN", "JACKAPILLAR", "TAFFIC", "CONE", "TOILETGANG", "FUFIK", "WILLNE",
+            "DEAD", "BILLBOARD", "BATHWATER", "MEMEULOUS", "JUICE", "NORA", "PROMISES", "REDDIT", "GEOGRAPHYSTUFF", "JACKVSHINDI",
+            "HUMPED", "SUCCESS", "DRAMA", "MRBEAST", "GLASSES", "CLEOPATRA", "VARUN", "UNICYCLE", "JUMBO", "KAYAK",
+            
+            // Days 61-90
+            "GREENSCREEN", "SCUMBAG", "STUPIF", "BARRY", "LARRY", "QUACK", "JIMMYVEGAS", "WILLYWARMER", "TREND", "DIAMOND",
+            "PEWDIEPIE", "COKE", "EQUATORIAL", "DADDY", "YOUTUBE", "EDITOR", "KAI", "THOMAS", "ALABANIA", "WEEWEEBUSH",
+            "TURDBOI", "HONEY", "NORDVPN", "ODOO", "JOSCAR", "FALLGUYS", "DRUNK", "TOMMYINNIT", "DAVEED", "PIRATE",
+            
+            // Days 91-110
+            "POPUP", "ATTIC", "KAZOO", "GIRLFRIEND", "PINK", "VIDEO", "GUINNESS", "PEEPEETREE", "SPINNY", "POBOX",
+            "PIGEON", "CORNELIOUS", "KONGRATS", "SAMBUCHA", "ONELIFE", "NEWS", "GRIDDY", "ZI8GZAG", "FARM", "RICKIE"
+        ];
+        
+        // 110 days of words for Hardcore mode (more difficult words)
+        const HARDCORE_WORDS = [
+            // Days 1-30
+            "WIKIFEET", "NEAL.FUN", "TUCKER", "ALDI", "THEMANORSPA", "DONIBOBES", "RUSSIANBEANS", "EDINBURUGHPENGUINS", "SCARYOBAMA", "FINDAGRAVE",
+            "MRASHISH", "HUGGYTHETEDDYBEAR", "YOUTOOZMISPRINT", "YELLOWHELLOW", "HARMONYHOLLOW", "WESAYINUNISON", "TRAFFICCONEBECKY", "LADS", "WELLS", "JACKSUCKSOSCAR",
+            "PROPERTYOFJACKUNDERWEAR", "HOTKNIFE", "HATEHASFOURLETTERS", "JHAIR", "CYBERMXN", "JUSTALFIE", "SAMSMELLSOFAPRICOTS", "HEADACHE", "JACKSUCKSATGEOGRAPHY", "JACKSEPICYOUTUBECHANNELFULLOFFUNTIMESANDFUNHIRICKXHASNOTHINGONMEIAMTHESUPERIORCHANNELIHAVEMORECHARACTERSTHANALLOFJACKSYOUTUBECHANNELSCOMBINEDHAHAHAHAIHAVEMORECHARACTERSTHANJACKSUCKSATLIFEJACKSUCKSATSTUFFJACKMASSEYWELSHJACKSUCKSATGEOGRAPHYJACKSUCKSATCLIPSSAMSMELLSOFAPRICOTSJACKSUCKSATPOPUPPIRATEETCETCIMAGINETHISONAPLAYBUTTONJESUSCHRISTBTWPLEASESUBSCRIBETHANKYOUVERYMUCHHIRICKXxXxXX"
+        ];
+        
+        // 110 days of countries for Countrylle mode (all UN recognized countries)
+        const COUNTRYLLE_WORDS = [
+            // Days 1-30 (shorter country names)
+            "CHINA", "INDIA", "JAPAN", "ITALY", "SPAIN", "EGYPT", "KENYA", "NIGER", "CHILE", "PERU",
+            "MEXICO", "PANAMA", "CUBA", "HAITI", "LAOS", "MALI", "MALTA", "NAURU", "NEPAL", "OMAN",
+            "QATAR", "SUDAN", "TOGO", "YEMEN", "ZAIRE", "BENIN", "GABON", "HAITI", "KYRGYZSTAN", "LIBYA",
+            
+            // Days 31-60 (medium length country names)
+            "FRANCE", "GERMANY", "GREECE", "ISRAEL", "JORDAN", "KUWAIT", "LEBANON", "MEXICO", "MOROCCO", "MYANMAR",
+            "NIGERIA", "NORWAY", "POLAND", "RWANDA", "SERBIA", "SWEDEN", "SYRIA", "TAIWAN", "TUNISIA", "TURKEY",
+            "UGANDA", "URUGUAY", "VIETNAM", "YEMEN", "ZAMBIA", "ALBANIA", "ALGERIA", "ANDORRA", "ANGOLA", "AUSTRIA",
+            
+            // Days 61-90 (longer country names)
+            "ARGENTINA", "AUSTRALIA", "BANGLADESH", "BELARUS", "BELGIUM", "BOLIVIA", "BOTSWANA", "BULGARIA", "CAMEROON", "COLOMBIA",
+            "CROATIA", "DENMARK", "ECUADOR", "ETHIOPIA", "GEORGIA", "HUNGARY", "ICELAND", "IRELAND", "JAMAICA", "KAZAKHSTAN",
+            "MALAWI", "MALDIVES", "MONGOLIA", "MOZAMBIQUE", "NICARAGUA", "PAKISTAN", "PARAGUAY", "PORTUGAL", "ROMANIA", "SLOVAKIA",
+            
+            // Days 91-110 (longest country names)
+            "AFGHANISTAN", "AZERBAIJAN", "BAHAMAS", "BAHRAIN", "BARBADOS", "BELIZE", "BHUTAN", "BRUNEI", "BURUNDI", "CAMBODIA",
+            "COMOROS", "DJIBOUTI", "DOMINICA", "ERITREA", "ESWATINI", "FIJI", "GAMBIA", "GRENADA", "GUINEA", "GUYANA",
+            "HONDURAS", "KIRIBATI", "LESOTHO", "LIBERIA", "LIECHTENSTEIN", "LUXEMBOURG", "MADAGASCAR", "MALAYSIA", "MAURITANIA", "MAURITIUS"
+        ];
+        
+        // All countries data for hints
+        const COUNTRY_DATA = {
+            "CHINA": { continent: "Asia", borders: ["AFGHANISTAN", "BHUTAN", "INDIA", "KAZAKHSTAN", "KYRGYZSTAN", "LAOS", "MONGOLIA", "MYANMAR", "NEPAL", "NORTH KOREA", "PAKISTAN", "RUSSIA", "TAJIKISTAN", "VIETNAM"] },
+            "INDIA": { continent: "Asia", borders: ["BANGLADESH", "BHUTAN", "CHINA", "MYANMAR", "NEPAL", "PAKISTAN", "SRI LANKA"] },
+            "JAPAN": { continent: "Asia", borders: [] },
+            "ITALY": { continent: "Europe", borders: ["AUSTRIA", "FRANCE", "SAN MARINO", "SLOVENIA", "SWITZERLAND", "VATICAN CITY"] },
+            "SPAIN": { continent: "Europe", borders: ["ANDORRA", "FRANCE", "GIBRALTAR", "MOROCCO", "PORTUGAL"] },
+            "EGYPT": { continent: "Africa", borders: ["ISRAEL", "LIBYA", "SUDAN", "GAZA STRIP"] },
+            "KENYA": { continent: "Africa", borders: ["ETHIOPIA", "SOMALIA", "SOUTH SUDAN", "TANZANIA", "UGANDA"] },
+            "NIGER": { continent: "Africa", borders: ["ALGERIA", "BENIN", "BURKINA FASO", "CHAD", "LIBYA", "MALI", "NIGERIA"] },
+            "CHILE": { continent: "South America", borders: ["ARGENTINA", "BOLIVIA", "PERU"] },
+            "PERU": { continent: "South America", borders: ["BOLIVIA", "BRAZIL", "CHILE", "COLOMBIA", "ECUADOR"] },
+            "MEXICO": { continent: "North America", borders: ["BELIZE", "GUATEMALA", "UNITED STATES"] },
+            "PANAMA": { continent: "North America", borders: ["COLOMBIA", "COSTA RICA"] },
+            "CUBA": { continent: "North America", borders: [] },
+            "HAITI": { continent: "North America", borders: ["DOMINICAN REPUBLIC"] },
+            "LAOS": { continent: "Asia", borders: ["CAMBODIA", "CHINA", "MYANMAR", "THAILAND", "VIETNAM"] },
+            "MALI": { continent: "Africa", borders: ["ALGERIA", "BURKINA FASO", "COTE D'IVOIRE", "GUINEA", "MAURITANIA", "NIGER", "SENEGAL"] },
+            "MALTA": { continent: "Europe", borders: [] },
+            "NAURU": { continent: "Oceania", borders: [] },
+            "NEPAL": { continent: "Asia", borders: ["CHINA", "INDIA"] },
+            "OMAN": { continent: "Asia", borders: ["SAUDI ARABIA", "UNITED ARAB EMIRATES", "YEMEN"] }
+        };
+        
+        // Game state
+        let gameState = {
+            mode: "normal",
+            currentDay: 1,
+            targetWord: "",
+            currentGuess: "",
+            guesses: [],
+            gameOver: false,
+            win: false,
+            stats: {
+                gamesPlayed: 0,
+                winStreak: 0,
+                wins: 0,
+                attempts: [],
+                lastPlayedDate: ""
+            },
+            dailyState: {}
+        };
+        
+        // DOM elements
+        const gameBoard = document.getElementById("game-board");
+        const messageEl = document.getElementById("message");
+        const countryHintEl = document.getElementById("country-hint");
+        const modeNameEl = document.getElementById("mode-name");
+        const modeDescriptionEl = document.getElementById("mode-description");
+        const gamesPlayedEl = document.getElementById("games-played");
+        const winStreakEl = document.getElementById("win-streak");
+        const winPercentageEl = document.getElementById("win-percentage");
+        const wordLengthIndicator = document.getElementById("word-length-indicator");
+        const currentWordLengthSpan = document.getElementById("current-word-length");
+        const currentDayEl = document.getElementById("current-day");
+        
+        // Popup elements
+        const failurePopup = document.getElementById("failure-popup");
+        const popupWordEl = document.getElementById("popup-word");
+        const popupNewGameBtn = document.getElementById("popup-new-game");
+        const popupCloseBtn = document.getElementById("popup-close");
+        
+        // Initialize the game
+        function initGame() {
+            // Load stats from localStorage
+            loadStats();
+                        
+            // Initialize keyboard
+            setupKeyboard();
+            
+            // Set initial game mode
+            setGameMode("normal");
+            
+            // Update stats display
+            updateStatsDisplay();
+            
+            // Setup popup event listeners
+            setupPopupListeners();
+            
+            // Focus on body for keyboard input
+            document.body.focus();
+        }
+        
+        // Setup popup event listeners
+        function setupPopupListeners() {
+            popupNewGameBtn.addEventListener("click", function() {
+                hideFailurePopup();
+                // Start a new game in the same mode
+                setGameMode(gameState.mode);
+            });
+            
+            popupCloseBtn.addEventListener("click", function() {
+                hideFailurePopup();
+            });
+            
+            // Close popup when clicking outside
+            failurePopup.addEventListener("click", function(e) {
+                if (e.target === failurePopup) {
+                    hideFailurePopup();
+                }
+            });
+        }
+        
+        // Show failure popup
+        function showFailurePopup(word) {
+            popupWordEl.textContent = word;
+            failurePopup.classList.add("show");
+        }
+        
+        // Hide failure popup
+        function hideFailurePopup() {
+            failurePopup.classList.remove("show");
+        }
+        
+        
+        // Get the word for the current day and mode
+        function getWordForDay(mode, day) {
+            const dayIndex = day - 1; // Convert to 0-based index
+            
+            switch(mode) {
+                case "normal":
+                    return NORMAL_WORDS[dayIndex] || NORMAL_WORDS[0];
+                case "hardcore":
+                    return HARDCORE_WORDS[dayIndex] || HARDCORE_WORDS[0];
+                case "countrylle":
+                    return COUNTRYLLE_WORDS[dayIndex] || COUNTRYLLE_WORDS[0];
+                default:
+                    return NORMAL_WORDS[0];
+            }
+        }
+        
+        // Create the game board with dynamic width based on target word
+        function createGameBoard() {
+            gameBoard.innerHTML = "";
+            
+            const wordLength = gameState.targetWord.length;
+            currentWordLengthSpan.textContent = wordLength;
+            
+            // Adjust tile size based on word length
+            let tileSize = 60;
+            if (wordLength > 10) tileSize = 50;
+            if (wordLength > 12) tileSize = 45;
+            if (wordLength > 14) tileSize = 40;
+            
+            for (let row = 0; row < CONFIG.maxAttempts; row++) {
+                const rowEl = document.createElement("div");
+                rowEl.className = "row";
+                rowEl.style.gridTemplateColumns = `repeat(${wordLength}, ${tileSize}px)`;
+                
+                for (let col = 0; col < wordLength; col++) {
+                    const tile = document.createElement("div");
+                    tile.className = "tile";
+                    tile.id = `tile-${row}-${col}`;
+                    tile.style.width = `${tileSize}px`;
+                    tile.style.height = `${tileSize}px`;
+                    rowEl.appendChild(tile);
+                }
+                
+                gameBoard.appendChild(rowEl);
+            }
+        }
+        
+        // Set game mode
+        function setGameMode(mode) {
+            gameState.mode = mode;
+            
+            // Get target word for current day
+            gameState.targetWord = getWordForDay(mode, gameState.currentDay);
+            
+            console.log(`${mode} mode, Day ${gameState.currentDay}: ${gameState.targetWord}`);
+            
+            // Create the game board with the correct dimensions
+            createGameBoard();
+            
+            // Load daily state for this mode and day
+            loadDailyState();
+            
+            // Reset current game state
+            gameState.currentGuess = "";
+            gameState.guesses = [];
+            gameState.gameOver = gameState.dailyState.gameOver || false;
+            gameState.win = gameState.dailyState.win || false;
+            
+            // Update UI
+            document.querySelectorAll(".mode-btn").forEach(btn => {
+                btn.classList.toggle("active", btn.dataset.mode === mode);
+            });
+            
+            modeNameEl.textContent = mode.charAt(0).toUpperCase() + mode.slice(1);
+            
+            // Update mode description
+            if (mode === "normal") {
+                modeDescriptionEl.textContent = `Guess the ${gameState.targetWord.length}-letter word of the day.`;
+            } else if (mode === "hardcore") {
+                modeDescriptionEl.textContent = `More challenging ${gameState.targetWord.length}-letter word of the day.`;
+            } else if (mode === "countrylle") {
+                modeDescriptionEl.textContent = "Guess the country of the day. After each guess, you'll get a hint about the relationship between your guess and the target country.";
+            }
+            
+            // Reset board or restore from saved state
+            clearBoard();
+            
+            if (gameState.dailyState.guesses && gameState.dailyState.guesses.length > 0) {
+                // Restore previous guesses
+                gameState.guesses = [...gameState.dailyState.guesses];
+                restoreBoardFromState();
+            }
+            
+            // Hide message
+            messageEl.textContent = "";
+            messageEl.className = "message";
+            
+            // Hide country hint
+            countryHintEl.classList.remove("show");
+            
+            // Show/hide word length indicator
+            wordLengthIndicator.style.display = mode === "countrylle" ? "block" : "none";
+            
+            // Update stats display
+            updateStatsDisplay();
+        }
+        
+        // Load daily state from localStorage
+        function loadDailyState() {
+            const key = `wordleDailyState_${gameState.mode}_${gameState.currentDay}`;
+            const savedState = localStorage.getItem(key);
+            
+            if (savedState) {
+                gameState.dailyState = JSON.parse(savedState);
+                
+                // Check if we have the right word
+                if (gameState.dailyState.targetWord !== gameState.targetWord) {
+                    // Reset if word doesn't match
+                    gameState.dailyState = {
+                        targetWord: gameState.targetWord,
+                        guesses: [],
+                        gameOver: false,
+                        win: false
+                    };
+                }
+            } else {
+                gameState.dailyState = {
+                    targetWord: gameState.targetWord,
+                    guesses: [],
+                    gameOver: false,
+                    win: false
+                };
+            }
+        }
+        
+        // Save daily state to localStorage
+        function saveDailyState() {
+            gameState.dailyState.guesses = [...gameState.guesses];
+            gameState.dailyState.gameOver = gameState.gameOver;
+            gameState.dailyState.win = gameState.win;
+            
+            const key = `wordleDailyState_${gameState.mode}_${gameState.currentDay}`;
+            localStorage.setItem(key, JSON.stringify(gameState.dailyState));
+        }
+        
+        // Clear the game board
+        function clearBoard() {
+            document.querySelectorAll(".tile").forEach(tile => {
+                tile.textContent = "";
+                tile.className = "tile";
+            });
+            
+            // Reset keyboard colors
+            document.querySelectorAll(".key").forEach(key => {
+                if (!key.dataset.key || (key.dataset.key !== "Enter" && key.dataset.key !== "Backspace")) {
+                    key.className = "key";
+                }
+            });
+        }
+        
+        // Restore board from saved state
+        function restoreBoardFromState() {
+            // First clear the board
+            clearBoard();
+            
+            // Restore each guess
+            for (let row = 0; row < gameState.guesses.length; row++) {
+                const guess = gameState.guesses[row];
+                const evaluation = evaluateGuess(guess, gameState.targetWord);
+                
+                // Update tiles
+                for (let col = 0; col < guess.length && col < gameState.targetWord.length; col++) {
+                    const tile = document.getElementById(`tile-${row}-${col}`);
+                    if (tile) {
+                        tile.textContent = guess[col];
+                        tile.classList.add("filled", evaluation[col]);
+                    }
+                }
+                
+                // Update keyboard
+                updateKeyboardColors(guess, evaluation);
+            }
+            
+            // If game was over, show appropriate message
+            if (gameState.dailyState.gameOver) {
+                if (gameState.dailyState.win) {
+                    showMessage(`You already solved this! The word was: ${gameState.targetWord}`, "success");
+                } else {
+                    showMessage(`Game over! The word was: ${gameState.targetWord}`, "error");
+                    // Don't show popup for previously lost games
+                }
+                
+                // Show country hint if in countrylle mode and game is over
+                if (gameState.mode === "countrylle") {
+                    showCountryHint("", gameState.targetWord, gameState.dailyState.win);
+                }
+            }
+        }
+        
+        // Setup keyboard event listeners
+        function setupKeyboard() {
+            // Physical keyboard
+            document.addEventListener("keydown", handleKeyPress);
+            
+            // On-screen keyboard
+            document.querySelectorAll(".key").forEach(key => {
+                key.addEventListener("click", () => {
+                    const keyValue = key.dataset.key;
+                    if (keyValue === "Enter") {
+                        submitGuess();
+                    } else if (keyValue === "Backspace") {
+                        deleteLetter();
+                    } else {
+                        addLetter(keyValue);
+                    }
+                });
+            });
+        }
+        
+        // Handle physical keyboard input
+        function handleKeyPress(e) {
+            if (gameState.gameOver) return;
+            
+            const key = e.key.toUpperCase();
+            
+            if (key === "ENTER") {
+                submitGuess();
+            } else if (key === "BACKSPACE") {
+                deleteLetter();
+            } else if (/^[A-Z]$/.test(key)) {
+                addLetter(key);
+            }
+        }
+        
+        // Add a letter to the current guess
+        function addLetter(letter) {
+            if (gameState.gameOver) return;
+            
+            if (gameState.currentGuess.length < gameState.targetWord.length) {
+                gameState.currentGuess += letter;
+                updateBoard();
+            }
+        }
+        
+        // Delete the last letter from current guess
+        function deleteLetter() {
+            if (gameState.gameOver) return;
+            
+            if (gameState.currentGuess.length > 0) {
+                gameState.currentGuess = gameState.currentGuess.slice(0, -1);
+                updateBoard();
+            }
+        }
+        
+        // Update the game board display
+        function updateBoard() {
+            const rowIndex = gameState.guesses.length;
+            const wordLength = gameState.targetWord.length;
+            
+            for (let col = 0; col < wordLength; col++) {
+                const tile = document.getElementById(`tile-${rowIndex}-${col}`);
+                if (tile) {
+                    if (col < gameState.currentGuess.length) {
+                        tile.textContent = gameState.currentGuess[col];
+                        tile.classList.add("filled");
+                    } else {
+                        tile.textContent = "";
+                        tile.classList.remove("filled");
+                    }
+                }
+            }
+        }
+        
+        // Submit a guess
+        function submitGuess() {
+            if (gameState.gameOver) {
+                showMessage("Game over! Try a different mode or come back tomorrow.", "error");
+                return;
+            }
+            
+            if (gameState.currentGuess.length !== gameState.targetWord.length) {
+                showMessage(`Guess must be ${gameState.targetWord.length} letters`, "error");
+                return;
+            }
+            
+            // Check if guess is valid (for countrylle mode)
+            if (gameState.mode === "countrylle") {
+                // For countrylle, we'll accept any country-like guess
+                // In a real implementation, you'd check against a full list
+            }
+            
+            // Process the guess
+            processGuess();
+        }
+        
+        // Process the current guess
+        function processGuess() {
+            const guess = gameState.currentGuess.toUpperCase();
+            const target = gameState.targetWord;
+            const rowIndex = gameState.guesses.length;
+            
+            // Add to guesses
+            gameState.guesses.push(guess);
+            
+            // Save progress
+            saveDailyState();
+            
+            // Evaluate the guess
+            const evaluation = evaluateGuess(guess, target);
+            
+            // Update board with colors
+            updateBoardWithEvaluation(rowIndex, evaluation);
+            
+            // Update keyboard colors
+            updateKeyboardColors(guess, evaluation);
+            
+            // Check for win
+            if (guess === target) {
+                gameState.win = true;
+                gameState.gameOver = true;
+                gameState.stats.wins++;
+                gameState.stats.winStreak++;
+                gameState.stats.attempts.push(rowIndex + 1);
+                showMessage(`Congratulations! You guessed the word in ${rowIndex + 1} tries!`, "success");
+                
+                // Show country hint if in countrylle mode
+                if (gameState.mode === "countrylle") {
+                    showCountryHint(target, target, true);
+                }
+            } else if (gameState.guesses.length >= CONFIG.maxAttempts) {
+                // Game over - out of attempts
+                gameState.gameOver = true;
+                gameState.stats.winStreak = 0;
+                gameState.stats.attempts.push(CONFIG.maxAttempts + 1); // +1 indicates loss
+                
+                // Show the failure popup
+                showFailurePopup(target);
+                
+                // Show country hint if in countrylle mode
+                if (gameState.mode === "countrylle") {
+                    showCountryHint("", target, false);
+                }
+            } else {
+                // Continue playing
+                gameState.currentGuess = "";
+                
+                // Show country hint if in countrylle mode
+                if (gameState.mode === "countrylle") {
+                    showCountryHint(guess, target, false);
+                }
+            }
+            
+            // Update stats and save
+            if (gameState.gameOver) {
+                gameState.stats.gamesPlayed++;
+                saveStats();
+                updateStatsDisplay();
+                saveDailyState();
+            }
+        }
+        
+        // Evaluate a guess against the target word
+        function evaluateGuess(guess, target) {
+            const evaluation = [];
+            const targetLetters = target.split('');
+            const guessLetters = guess.split('');
+            
+            // First pass: mark correct letters
+            for (let i = 0; i < guessLetters.length && i < targetLetters.length; i++) {
+                if (guessLetters[i] === targetLetters[i]) {
+                    evaluation[i] = "correct";
+                    targetLetters[i] = null; // Mark as used
+                }
+            }
+            
+            // Second pass: mark present letters
+            for (let i = 0; i < guessLetters.length && i < targetLetters.length; i++) {
+                if (evaluation[i] === "correct") continue;
+                
+                const index = targetLetters.indexOf(guessLetters[i]);
+                if (index !== -1) {
+                    evaluation[i] = "present";
+                    targetLetters[index] = null; // Mark as used
+                } else {
+                    evaluation[i] = "absent";
+                }
+            }
+            
+            // Mark any remaining letters as absent
+            for (let i = evaluation.length; i < guessLetters.length; i++) {
+                evaluation[i] = "absent";
+            }
+            
+            return evaluation;
+        }
+        
+        // Update board with evaluation colors
+        function updateBoardWithEvaluation(rowIndex, evaluation) {
+            const wordLength = gameState.targetWord.length;
+            
+            for (let col = 0; col < wordLength; col++) {
+                const tile = document.getElementById(`tile-${rowIndex}-${col}`);
+                if (tile && evaluation[col]) {
+                    const delay = col * 100;
+                    
+                    setTimeout(() => {
+                        tile.classList.add(evaluation[col]);
+                    }, delay);
+                }
+            }
+        }
+        
+        // Update keyboard colors based on evaluation
+        function updateKeyboardColors(guess, evaluation) {
+            for (let i = 0; i < guess.length; i++) {
+                const key = document.querySelector(`.key[data-key="${guess[i]}"]`);
+                if (!key) continue;
+                
+                if (evaluation[i] === "correct") {
+                    key.classList.remove("present", "absent");
+                    key.classList.add("correct");
+                } else if (evaluation[i] === "present" && !key.classList.contains("correct")) {
+                    key.classList.remove("absent");
+                    key.classList.add("present");
+                } else if (evaluation[i] === "absent" && 
+                          !key.classList.contains("correct") && 
+                          !key.classList.contains("present")) {
+                    key.classList.add("absent");
+                }
+            }
+        }
+        
+        // Show country hint for Countrylle mode
+        function showCountryHint(guess, target, isWin) {
+            if (gameState.mode !== "countrylle") return;
+            
+            let hint = "";
+            
+            if (isWin) {
+                hint = `Correct! The country was ${target}.`;
+            } else if (guess) {
+                // Generate a hint based on the relationship between guess and target
+                hint = generateCountryHint(guess, target);
+            } else {
+                hint = `The country was ${target}.`;
+            }
+            
+            countryHintEl.innerHTML = hint;
+            countryHintEl.classList.add("show");
+        }
+        
+        // Generate a country hint
+        function generateCountryHint(guess, target) {
+            if (guess === target) return `Correct! The country is ${target}.`;
+            
+            const guessData = COUNTRY_DATA[guess] || { continent: "Unknown", borders: [] };
+            const targetData = COUNTRY_DATA[target] || { continent: "Unknown", borders: [] };
+            
+            let hints = [];
+            
+            // Check if countries border each other
+            if (guessData.borders && guessData.borders.includes(target)) {
+                hints.push(`<strong>${guess} borders ${target}!</strong>`);
+            } else if (targetData.borders && targetData.borders.includes(guess)) {
+                hints.push(`<strong>${target} borders ${guess}!</strong>`);
+            }
+            
+            // Continent hint
+            if (guessData.continent === targetData.continent) {
+                hints.push(`Both countries are in <strong>${guessData.continent}</strong>`);
+            } else {
+                hints.push(`${guess} is in <strong>${guessData.continent}</strong>, but the target is in <strong>${targetData.continent}</strong>`);
+            }
+            
+            return hints.join(". ") + ".";
+        }
+        
+        // Show message
+        function showMessage(text, type) {
+            messageEl.textContent = text;
+            messageEl.className = `message ${type}`;
+            
+            // Clear message after 3 seconds for errors
+            if (type === "error") {
+                setTimeout(() => {
+                    messageEl.textContent = "";
+                    messageEl.className = "message";
+                }, 3000);
+            }
+        }
+        
+        // Load stats from localStorage
+        function loadStats() {
+            const savedStats = localStorage.getItem("wordleStats");
+            if (savedStats) {
+                gameState.stats = JSON.parse(savedStats);
+            }
+        }
+        
+        // Save stats to localStorage
+        function saveStats() {
+            localStorage.setItem("wordleStats", JSON.stringify(gameState.stats));
+        }
+        
+        // Update stats display
+        function updateStatsDisplay() {
+            gamesPlayedEl.textContent = gameState.stats.gamesPlayed;
+            winStreakEl.textContent = gameState.stats.winStreak;
+            
+            const winPercentage = gameState.stats.gamesPlayed > 0 
+                ? Math.round((gameState.stats.wins / gameState.stats.gamesPlayed) * 100) 
+                : 0;
+            winPercentageEl.textContent = `${winPercentage}%`;
+        }
+        
+        // Event listeners for mode buttons
+        document.querySelectorAll(".mode-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                setGameMode(btn.dataset.mode);
+            });
+        });
+        
+        // Initialize the game when page loads
+        window.addEventListener("load", initGame);
+    </script>
+</body>
+</html>
