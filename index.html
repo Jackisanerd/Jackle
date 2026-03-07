@@ -567,13 +567,33 @@
         ];
         
         // 110 days of words for Hardcore mode (more difficult words)
-        const HARDCORE_WORDS = [
-            // Days 1-30
-            "WIKIFEET", "NEALFUN", "TUCKER", "ALDI", "THEMANORSPA", "DONIBOBES", "RUSSIANBEANS", "EDINBURUGHPENGUINS", "SCARYOBAMA", "FINDAGRAVE",
-            "MRASHISH", "HUGGYTHETEDDYBEAR", "YOUTOOZMISPRINT", "YELLOWHELLOW", "HARMONYHOLLOW", "WESAYINUNISON", "TRAFFICCONEBECKY", "LADS", "WELLS", "JACKSUCKSOSCAR",
-            "PROPERTYOFJACKUNDERWEAR", "HOTKNIFE", "HATEHASFOURLETTERS", "JHAIR", "CYBERMXN", "JUSTALFIE", "SAMSMELLSOFAPRICOTS", "HEADACHE", "JACKSUCKSATGEOGRAPHY", "JACKSEPICYOUTUBECHANNELFULLOFFUNTIMESANDFUNHIRICKXHASNOTHINGONMEIAMTHESUPERIORCHANNELIHAVEMORECHARACTERSTHANALLOFJACKSYOUTUBECHANNELSCOMBINEDHAHAHAHAIHAVEMORECHARACTERSTHANJACKSUCKSATLIFEJACKSUCKSATSTUFFJACKMASSEYWELSHJACKSUCKSATGEOGRAPHYJACKSUCKSATCLIPSSAMSMELLSOFAPRICOTSJACKSUCKSATPOPUPPIRATEETCETCIMAGINETHISONAPLAYBUTTONJESUSCHRISTBTWPLEASESUBSCRIBETHANKYOUVERYMUCHHIRICKXxXxXX"
-        ];
-        
+const HARDCORE_WORDS = [
+    "JACKOFFS", "SUCKERS", "JACKPACK", "WIKIFEET", "NEALFUN", 
+    "TUCKER", "ALDI", "THEMANORSPA", "DONIBOBES", "RUSSIANBEANS",
+    "EDINBURUGHPENGUINS", "SCARYOBAMA", "FINDAGRAVE", "MRASHISH", "HUGGYTHETEDDYBEAR",
+    "YOUTOOZMISPRINT", "YELLOWHELLOW", "HARMONYHOLLOW", "WESAYINUNISON", "TRAFFICCONEBECKY",
+    "LADS", "WELLS", "JACKSUCKSOSCAR", "PROPERTYOFJACKUNDERWEAR", "HOTKNIFE",
+    "HATEHASFOURLETTERS", "JHAIR", "CYBERMXN", "JUSTALFIE", "SAMSMELLSOFAPRICOTS",
+    "HEADACHE", "JACKSUCKSATGEOGRAPHY", "JACKSUCKSATSTUFF", "JACKMASSEYWELSH", "JACKSUCKSATCLIPS",
+    "JACKSUCKSATPOPUPPIRATE", "JACKSUCKSATWIGS", "FUFIK", "EJSAFC", "JACKMW",
+    "ULTRARARETURDBOI", "HANDDRAWN", "CARD", "TDDFOUR1", "BARRY",
+    "LARRY", "QUACK", "JIMMYVEGAS", "WILLYWARMER", "TREND",
+    "DIAMOND", "PEWDIEPIE", "COKE", "EQUATORIAL", "DADDY",
+    "YOUTUBE", "EDITOR", "KAI", "THOMAS", "ALABANIA",
+    "WEEWEEBUSH", "TURDBOI", "HONEY", "NORDVPN", "ODOO",
+    "JOSCAR", "FALLGUYS", "DRUNK", "TOMMYINNIT", "DAVEED",
+    "PIRATE", "POPUP", "ATTIC", "KAZOO", "GIRLFRIEND",
+    "PINK", "VIDEO", "GUINNESS", "PEEPEETREE", "SPINNY",
+    "POBOX", "PIGEON", "CORNELIOUS", "KONGRATS", "SAMBUCHA",
+    "ONELIFE", "NEWS", "GRIDDY", "ZI8GZAG", "FARM",
+    "RICKIE", "DREAM", "TRADINGCARDS", "MINECRAFT", "VEGETARIAN",
+    "JACKAPILLAR", "TRAFFICCONE", "CONE", "TOILETGANG", "WILLNE",
+    "DEAD", "BILLBOARD", "BATHWATER", "MEMEULOUS", "JUICE",
+    "NORA", "PROMISES", "REDDIT", "GEOGRAPHYSTUFF", "JACKVSHINDI",
+    "HUMPED", "SUCCESS", "DRAMA", "MRBEAST", "GLASSES",
+    "CLEOPATRA", "VARUN", "UNICYCLE", "JUMBO", "KAYAK",
+    "JACKSEPICYOUTUBECHANNELFULLOFFUNTIMESANDFUNHIRICKXHASNOTHINGONMEIAMTHESUPERIORCHANNELIHAVEMORECHARACTERSTHANALLOFJACKSYOUTUBECHANNELSCOMBINEDHAHAHAHAIHAVEMORECHARACTERSTHANJACKSUCKSATLIFEJACKSUCKSATSTUFFJACKMASSEYWELSHJACKSUCKSATGEOGRAPHYJACKSUCKSATCLIPSSAMSMELLSOFAPRICOTSJACKSUCKSATPOPUPPIRATEETCETCIMAGINETHISONAPLAYBUTTONJESUSCHRISTBTWPLEASESUBSCRIBETHANKYOUVERYMUCHHIRICKXxXxXX"
+];
         // 110 days of countries for Countrylle mode (all UN recognized countries)
         const COUNTRYLLE_WORDS = [
             // Days 1-30 (shorter country names)
@@ -597,7 +617,6 @@
             "HONDURAS", "KIRIBATI", "LESOTHO", "LIBERIA", "LIECHTENSTEIN", "LUXEMBOURG", "MADAGASCAR", "MALAYSIA", "MAURITANIA", "MAURITIUS"
         ];
         
-        // All countries data for hints
         const COUNTRY_DATA = {
             "CHINA": { continent: "Asia", borders: ["AFGHANISTAN", "BHUTAN", "INDIA", "KAZAKHSTAN", "KYRGYZSTAN", "LAOS", "MONGOLIA", "MYANMAR", "NEPAL", "NORTH KOREA", "PAKISTAN", "RUSSIA", "TAJIKISTAN", "VIETNAM"] },
             "INDIA": { continent: "Asia", borders: ["BANGLADESH", "BHUTAN", "CHINA", "MYANMAR", "NEPAL", "PAKISTAN", "SRI LANKA"] },
@@ -925,12 +944,10 @@
             }
         }
         
-        // Setup keyboard event listeners
         function setupKeyboard() {
             // Physical keyboard
             document.addEventListener("keydown", handleKeyPress);
             
-            // On-screen keyboard
             document.querySelectorAll(".key").forEach(key => {
                 key.addEventListener("click", () => {
                     const keyValue = key.dataset.key;
@@ -945,7 +962,6 @@
             });
         }
         
-        // Handle physical keyboard input
         function handleKeyPress(e) {
             if (gameState.gameOver) return;
             
@@ -960,7 +976,6 @@
             }
         }
         
-        // Add a letter to the current guess
         function addLetter(letter) {
             if (gameState.gameOver) return;
             
@@ -970,7 +985,6 @@
             }
         }
         
-        // Delete the last letter from current guess
         function deleteLetter() {
             if (gameState.gameOver) return;
             
@@ -1177,7 +1191,6 @@
             countryHintEl.classList.add("show");
         }
         
-        // Generate a country hint
         function generateCountryHint(guess, target) {
             if (guess === target) return `Correct! The country is ${target}.`;
             
